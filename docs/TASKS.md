@@ -5,7 +5,7 @@
   - Instalar dependências: `react-hook-form`, `zod`, `@hookform/resolvers`, `@tanstack/react-query`, `@tanstack/react-virtual`.
   - Configurar layout base com abas para navegação entre os experimentos.
 
-- [ ] **Tarefa 2: O Desafio do Formulário Pesado (useState vs. react-hook-form + Zod)**
+- [x] **Tarefa 2: O Desafio do Formulário Pesado (useState vs. react-hook-form + Zod)**
   - Implementar o formulário com 25+ campos paramétricos.
   - Criar componente de contador de renderizações (`RenderCounter`).
   - Implementar o switch entre Modo Controlado (`useState`) e Modo Otimizado (`react-hook-form` + Zod schema).
