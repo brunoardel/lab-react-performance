@@ -24,7 +24,7 @@ export const TABS: TabConfig[] = [
     rfCode: 'RF01',
     subtitle: 'useState vs. react-hook-form + Zod',
     iconName: 'FileSpreadsheet',
-    badge: 'Tarefa 2',
+    badge: 'Pronto',
   },
   {
     id: 'dense-table',
