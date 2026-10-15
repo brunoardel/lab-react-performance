@@ -15,7 +15,7 @@
   - Implementar a tabela sem virtualização vs. tabela com `@tanstack/react-virtual`.
   - Integrar filtro de texto com `useTransition` exibindo spinner/feedback durante o processamento em background.
 
-- [ ] **Tarefa 4: Mitigação de Race Condition com AbortController**
+- [x] **Tarefa 4: Mitigação de Race Condition com AbortController**
   - Criar serviço simulado de API com latência configurável.
   - Criar componente demonstrando a falha de requisições fora de ordem.
   - Implementar a correção usando `AbortController` com `signal` no cleanup do `useEffect`.
