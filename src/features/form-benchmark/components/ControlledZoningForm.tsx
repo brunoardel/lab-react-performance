@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   ZONING_GROUPS,
   type ZoningFormData,
@@ -6,11 +6,11 @@ import {
 } from '../schema/zoningSchema'
 import { RenderCounter } from '../../../components/common/RenderCounter'
 import { Badge } from '../../../components/common/Badge'
-import { AlertCircle, RotateCcw, Check } from 'lucide-react'
+import { AlertCircle, RotateCcw, Check, Flame } from 'lucide-react'
 
 interface ControlledZoningFormProps {
   initialValues: ZoningFormData
-  onDataChange: (data: ZoningFormData) => void
+  onDataChange?: (data: ZoningFormData) => void
   onReset: () => void
 }
 
@@ -22,6 +22,11 @@ export function ControlledZoningForm({
   // Estado único na raiz para todos os 28 campos (Abordagem Ingênua)
   const [formData, setFormData] = useState<ZoningFormData>(initialValues)
   const [submitted, setSubmitted] = useState(false)
+  const [lastEditedField, setLastEditedField] = useState<string>('Nenhum ainda')
+
+  // Contador real de renders da raiz
+  const rootRenderCount = useRef(0)
+  rootRenderCount.current += 1
 
   const handleFieldChange = (key: keyof ZoningFormData, value: string) => {
     const numValue = Number(value)
@@ -29,8 +34,11 @@ export function ControlledZoningForm({
       ...formData,
       [key]: isNaN(numValue) ? value : numValue,
     }
+    setLastEditedField(String(key))
     setFormData(updated)
-    onDataChange(updated)
+    if (onDataChange) {
+      onDataChange(updated)
+    }
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -41,33 +49,41 @@ export function ControlledZoningForm({
 
   const handleResetForm = () => {
     setFormData(initialValues)
+    setLastEditedField('Resetado')
     onReset()
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Banner de Status do Modo A */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-rose-900/40 bg-rose-950/20 p-4">
+      {/* Banner de Diagnóstico do Modo A */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-rose-900/50 bg-rose-950/20 p-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-rose-500/10 text-rose-400">
-            <AlertCircle className="h-5 w-5" />
+          <div className="p-2.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20">
+            <Flame className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold text-rose-300">
                 Modo A: Estado Controlado na Raiz (useState)
               </span>
-              <Badge variant="rose">28+ Campos</Badge>
+              <Badge variant="rose">Gargalo de CPU</Badge>
             </div>
-            <p className="text-xs text-rose-200/80">
-              Cada caractere digitado dispara `setFormData`, provocando o re-render síncrono de todos os 28 campos e da raiz.
+            <p className="text-xs text-rose-200/80 mt-0.5">
+              Cada caractere digitado dispara <code className="text-rose-300">setFormData</code>, forçando o React a recalcular a árvore inteira (28 campos).
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
-          <span className="text-xs text-rose-300 font-mono">Raiz Form:</span>
-          <RenderCounter componentName="RaizForm" variant="pill" className="bg-rose-950/80 border-rose-800" />
+        {/* Telemetria do Modo A */}
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="flex flex-col items-end text-xs">
+            <span className="text-[10px] text-slate-400 font-mono">Último campo editado:</span>
+            <span className="font-mono font-bold text-rose-300">{lastEditedField}</span>
+          </div>
+          <div className="flex items-center gap-2 bg-slate-950/80 border border-rose-800/60 px-3 py-1.5 rounded-lg">
+            <span className="text-xs text-rose-300 font-mono font-semibold">Raiz:</span>
+            <RenderCounter componentName="Raiz" variant="compact" />
+          </div>
         </div>
       </div>
 
@@ -144,19 +160,26 @@ export function ControlledZoningForm({
           Restaurar Valores Padrão
         </button>
 
-        <button
-          type="submit"
-          className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-5 py-2 text-xs font-bold text-white shadow-lg shadow-rose-900/40 hover:bg-rose-500 transition-colors"
-        >
-          {submitted ? (
-            <>
-              <Check className="h-4 w-4" />
-              Parâmetros Salvos!
-            </>
-          ) : (
-            'Salvar Parâmetros (useState)'
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-rose-400 bg-rose-950/30 px-3 py-1.5 rounded-lg border border-rose-900/40">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+            <span>28 campos re-renderizam a cada tecla</span>
+          </div>
+
+          <button
+            type="submit"
+            className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-5 py-2 text-xs font-bold text-white shadow-lg shadow-rose-900/40 hover:bg-rose-500 transition-colors"
+          >
+            {submitted ? (
+              <>
+                <Check className="h-4 w-4" />
+                Parâmetros Salvos!
+              </>
+            ) : (
+              'Salvar Parâmetros (useState)'
+            )}
+          </button>
+        </div>
       </div>
     </form>
   )
