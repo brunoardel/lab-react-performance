@@ -40,7 +40,7 @@ export const TABS: TabConfig[] = [
     rfCode: 'RF04',
     subtitle: 'Resiliência com AbortController',
     iconName: 'Flame',
-    badge: 'Tarefa 4',
+    badge: 'Pronto',
   },
   {
     id: 'server-cache',
