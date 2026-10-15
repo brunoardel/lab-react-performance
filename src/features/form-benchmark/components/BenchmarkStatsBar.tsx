@@ -1,11 +1,12 @@
 import { Badge } from '../../../components/common/Badge'
 import { Card } from '../../../components/common/Card'
-import { Cpu, Zap, Activity, Play, Sparkles } from 'lucide-react'
+import { Cpu, Zap, Activity, Play, Sparkles, RotateCcw } from 'lucide-react'
 
 interface BenchmarkStatsBarProps {
   currentMode: 'controlled' | 'optimized'
   onToggleMode: (mode: 'controlled' | 'optimized') => void
   onRunStressTest: () => void
+  onResetCounters: () => void
   isStressTesting: boolean
 }
 
@@ -13,6 +14,7 @@ export function BenchmarkStatsBar({
   currentMode,
   onToggleMode,
   onRunStressTest,
+  onResetCounters,
   isStressTesting,
 }: BenchmarkStatsBarProps) {
   return (
@@ -27,12 +29,13 @@ export function BenchmarkStatsBar({
             Seletor de Modo de Renderização
           </h3>
           <p className="text-xs text-slate-400">
-            Alterne entre as estratégias para observar o comportamento dos contadores visuais de renderização.
+            Alterne entre as estratégias e digite nos campos para ver os contadores visuais em ação.
           </p>
         </div>
 
-        {/* Toggle Buttons */}
+        {/* Toggle Buttons & Actions */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Alternador Modo A vs Modo B */}
           <div className="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-800">
             <button
               type="button"
@@ -43,7 +46,7 @@ export function BenchmarkStatsBar({
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Cpu className="h-3.5 w-3.5" />
+              <Cpu className="h-3.5 w-3.5 text-rose-400" />
               <span>Modo A (useState)</span>
             </button>
 
@@ -56,11 +59,23 @@ export function BenchmarkStatsBar({
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Zap className="h-3.5 w-3.5" />
+              <Zap className="h-3.5 w-3.5 text-emerald-400" />
               <span>Modo B (RHF + Zod)</span>
             </button>
           </div>
 
+          {/* Botão de Zerar Contadores */}
+          <button
+            type="button"
+            onClick={onResetCounters}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-all"
+            title="Reinicia os contadores para testar a contagem a partir de 1"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            <span>Zerar Contadores</span>
+          </button>
+
+          {/* Stress Test */}
           <button
             type="button"
             onClick={onRunStressTest}
@@ -75,7 +90,7 @@ export function BenchmarkStatsBar({
             {isStressTesting ? (
               <>
                 <Activity className="h-3.5 w-3.5 animate-spin" />
-                <span>Simulando digitação...</span>
+                <span>Simulando...</span>
               </>
             ) : (
               <>
@@ -95,12 +110,12 @@ export function BenchmarkStatsBar({
             {currentMode === 'controlled' ? (
               <>
                 <span className="h-2 w-2 rounded-full bg-rose-400"></span>
-                <span>Controlado na Raiz</span>
+                <span className="text-rose-300">Controlado na Raiz</span>
               </>
             ) : (
               <>
                 <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
-                <span>Não-Controlado (Refs)</span>
+                <span className="text-emerald-300">Não-Controlado (Refs)</span>
               </>
             )}
           </div>
@@ -113,7 +128,7 @@ export function BenchmarkStatsBar({
           <div className="text-slate-400 text-[11px] mb-1">Custo por Tecla</div>
           <div className="font-semibold font-mono text-slate-100 flex items-center gap-1.5">
             {currentMode === 'controlled' ? (
-              <span className="text-rose-400 font-bold">28+ Renders / tecla</span>
+              <span className="text-rose-400 font-bold">29 Renders / tecla</span>
             ) : (
               <span className="text-emerald-400 font-bold">0 Renders da Árvore</span>
             )}
@@ -136,7 +151,7 @@ export function BenchmarkStatsBar({
             )}
           </div>
           <span className="text-[10px] text-slate-500 font-mono">
-            {currentMode === 'controlled' ? 'Sem schema estrito' : 'Zod parse em tempo real'}
+            {currentMode === 'controlled' ? 'Sem schema estrito' : 'Zod parse no submit'}
           </span>
         </div>
 

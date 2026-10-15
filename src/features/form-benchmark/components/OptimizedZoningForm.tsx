@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -24,16 +24,20 @@ export function OptimizedZoningForm({
 }: OptimizedZoningFormProps) {
   const [submitted, setSubmitted] = useState(false)
 
-  // React Hook Form com Zod resolver e formulário NÃO-CONTROLADO por refs
+  // Contador de renders da raiz do Modo B
+  const rootRenderCount = useRef(0)
+  rootRenderCount.current += 1
+
+  // React Hook Form com modo 'onSubmit' para ZERO re-renders durante a digitação
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = useForm<ZoningFormData>({
     resolver: zodResolver(zoningSchema),
     defaultValues: initialValues,
-    mode: 'onTouched', // valida no blur/touch sem disparar re-render de toda a árvore na digitação
+    mode: 'onSubmit', // valida apenas no submit/ação sem tocar na reconciliação da digitação
   })
 
   const onSubmit = (data: ZoningFormData) => {
@@ -49,10 +53,10 @@ export function OptimizedZoningForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Banner de Status do Modo B */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-emerald-900/40 bg-emerald-950/20 p-4">
+      {/* Banner de Diagnóstico do Modo B */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-emerald-900/50 bg-emerald-950/20 p-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+          <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             <Zap className="h-5 w-5" />
           </div>
           <div>
@@ -62,15 +66,22 @@ export function OptimizedZoningForm({
               </span>
               <Badge variant="emerald">60 FPS Digitação</Badge>
             </div>
-            <p className="text-xs text-emerald-200/80">
-              Inputs operam via referências diretas no DOM. A digitação não aciona o reconciliador do React nem re-renderiza campos vizinhos.
+            <p className="text-xs text-emerald-200/80 mt-0.5">
+              Inputs usam referências diretas no DOM (<code className="text-emerald-300">refs</code>). Digite à vontade: a raiz e os 28 campos vizinhos sofrem <strong>0 re-renders</strong>!
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
-          <span className="text-xs text-emerald-300 font-mono">Raiz Form:</span>
-          <RenderCounter componentName="RaizForm" variant="pill" className="bg-emerald-950/80 border-emerald-800" />
+        {/* Telemetria do Modo B */}
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/50">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            <span className="text-[11px] font-mono">0 re-renders/tecla</span>
+          </div>
+          <div className="flex items-center gap-2 bg-slate-950/80 border border-emerald-800/60 px-3 py-1.5 rounded-lg">
+            <span className="text-xs text-emerald-300 font-mono font-semibold">Raiz:</span>
+            <RenderCounter componentName="Raiz" variant="compact" />
+          </div>
         </div>
       </div>
 
@@ -152,36 +163,35 @@ export function OptimizedZoningForm({
 
       {/* Ações do Formulário */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={handleResetForm}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/80 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            Restaurar Valores Padrão
-          </button>
+        <button
+          type="button"
+          onClick={handleResetForm}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/80 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+        >
+          <RotateCcw className="h-3.5 w-3.5" />
+          Restaurar Valores Padrão
+        </button>
 
+        <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400">
             <ShieldCheck className="h-4 w-4 text-emerald-400" />
-            <span>Validação Zod Ativa</span>
-            {isDirty && <span className="text-[10px] font-mono text-amber-400">• modificado</span>}
+            <span>Validação Zod declarativa</span>
           </div>
-        </div>
 
-        <button
-          type="submit"
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-xs font-bold text-white shadow-lg shadow-emerald-900/40 hover:bg-emerald-500 transition-colors"
-        >
-          {submitted ? (
-            <>
-              <Check className="h-4 w-4" />
-              Validado com Zod e Salvo!
-            </>
-          ) : (
-            'Validar com Zod & Salvar'
-          )}
-        </button>
+          <button
+            type="submit"
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-xs font-bold text-white shadow-lg shadow-emerald-900/40 hover:bg-emerald-500 transition-colors"
+          >
+            {submitted ? (
+              <>
+                <Check className="h-4 w-4" />
+                Validado e Salvo com Sucesso!
+              </>
+            ) : (
+              'Validar com Zod & Salvar'
+            )}
+          </button>
+        </div>
       </div>
     </form>
   )
