@@ -10,7 +10,7 @@
   - Criar componente de contador de renderizações (`RenderCounter`).
   - Implementar o switch entre Modo Controlado (`useState`) e Modo Otimizado (`react-hook-form` + Zod schema).
 
-- [ ] **Tarefa 3: Concorrência no React 18 e Virtualização de Tabela**
+- [x] **Tarefa 3: Concorrência no React 18 e Virtualização de Tabela**
   - Gerar mock de 2.500 registros de estudos urbanísticos.
   - Implementar a tabela sem virtualização vs. tabela com `@tanstack/react-virtual`.
   - Integrar filtro de texto com `useTransition` exibindo spinner/feedback durante o processamento em background.

@@ -32,7 +32,7 @@ export const TABS: TabConfig[] = [
     rfCode: 'RF02 & RF03',
     subtitle: 'TanStack Virtual + React 18 Transitions',
     iconName: 'Table2',
-    badge: 'Tarefa 3',
+    badge: 'Pronto',
   },
   {
     id: 'race-condition',
