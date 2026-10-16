@@ -20,6 +20,6 @@
   - Criar componente demonstrando a falha de requisições fora de ordem.
   - Implementar a correção usando `AbortController` com `signal` no cleanup do `useEffect`.
 
-- [ ] **Tarefa 5: Server State & Ciclo de Cache com TanStack Query**
+- [x] **Tarefa 5: Server State & Ciclo de Cache com TanStack Query**
   - Envolver a aplicação com `QueryClientProvider`.
   - Implementar queries com `staleTime` de 1 minuto e mutação com invalidação de cache declarativa.
